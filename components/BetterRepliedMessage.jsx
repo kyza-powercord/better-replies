@@ -66,7 +66,7 @@ class BetterRepliedMessage extends React.PureComponent {
 			this.checkUpdateMessage
 		);
 
-		FluxDispatcher.subscribe("MESSAGE_DELETE", this.messageDeleted);
+		FluxDispatcher.subscribe("MESSAGE_DELETE", this.checkMessageDeleted);
 
 		messageUpdateInterval = setInterval(() => {
 			this.forceUpdateMessage();
@@ -84,7 +84,7 @@ class BetterRepliedMessage extends React.PureComponent {
 			this.checkUpdateMessage
 		);
 
-		FluxDispatcher.unsubscribe("MESSAGE_DELETE", this.messageDeleted);
+		FluxDispatcher.unsubscribe("MESSAGE_DELETE", this.checkMessageDeleted);
 
 		clearInterval(messageUpdateInterval);
 	};
@@ -93,21 +93,31 @@ class BetterRepliedMessage extends React.PureComponent {
 		this.uninit();
 	};
 
-	messageDeleted = (args) => {
+	checkMessageDeleted = (args) => {
 		if (args?.id === this.props.message_id) {
-			this.setState({ messageDeleted: true });
+			this.messageDeleted();
 		}
+	};
+
+	messageDeleted = () => {
+		this.setState({ messageDeleted: true });
 	};
 
 	getMessage = () => {
 		if (this?.state?.messageDeleted) return null;
-		return (
+
+		const message =
 			getMessage(this.props.channel_id, this.props.message_id) ??
 			getMessageByReference({
 				message_id: this.props.message_id,
-			}).message ??
-			this?.state?.message
-		);
+			}).message;
+
+		console.log(message);
+
+		// Assume the message is deleted for now.
+		if (!message) this.messageDeleted();
+
+		return message;
 	};
 
 	checkUpdateMessage = (args) => {
