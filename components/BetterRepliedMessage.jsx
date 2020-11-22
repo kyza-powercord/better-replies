@@ -9,6 +9,8 @@ const {
 	},
 } = require("powercord");
 
+const JumpButton = require("./JumpButton");
+
 // const MessageCache = require("../MessageCache");
 
 const classes = {
@@ -43,7 +45,8 @@ class BetterRepliedMessage extends React.PureComponent {
 			message: this.getMessage(),
 			channel: getChannel(this.props.channel_id),
 			error: null,
-			style: "default" ?? "default",
+			messageDeleted: false,
+			style: this.props.style ?? "default",
 		};
 
 		this.init();
@@ -62,6 +65,9 @@ class BetterRepliedMessage extends React.PureComponent {
 			"MESSAGE_REACTION_REMOVE",
 			this.checkUpdateMessage
 		);
+
+		FluxDispatcher.subscribe("MESSAGE_DELETE", this.messageDeleted);
+
 		messageUpdateInterval = setInterval(() => {
 			this.forceUpdateMessage();
 		}, 1e3);
@@ -77,6 +83,9 @@ class BetterRepliedMessage extends React.PureComponent {
 			"MESSAGE_REACTION_REMOVE",
 			this.checkUpdateMessage
 		);
+
+		FluxDispatcher.unsubscribe("MESSAGE_DELETE", this.messageDeleted);
+
 		clearInterval(messageUpdateInterval);
 	};
 
@@ -84,7 +93,14 @@ class BetterRepliedMessage extends React.PureComponent {
 		this.uninit();
 	};
 
+	messageDeleted = (args) => {
+		if (args?.id === this.props.message_id) {
+			this.setState({ messageDeleted: true });
+		}
+	};
+
 	getMessage = () => {
+		if (this?.state?.messageDeleted) return null;
 		return (
 			getMessage(this.props.channel_id, this.props.message_id) ??
 			getMessageByReference({
@@ -109,12 +125,15 @@ class BetterRepliedMessage extends React.PureComponent {
 	render() {
 		this.init();
 
-		let replyElement = "Loading...";
-		if (this.state.error) {
-			console.error(this.state.error);
-			replyElement = this.state.error.toString();
+		let replyElement = "";
+
+		let messageElement = "      Loading...   ";
+		if (this.state.messageDeleted) {
+			messageElement = "   Message deleted.   ";
+		} else if (this.state.error) {
+			messageElement = this.state.error.toString();
 		} else if (this.state.message && this.state.channel) {
-			const messageElement = (
+			messageElement = (
 				<ChannelMessage
 					id={`better-reply-${this.props.message_id}-depth-${this.state.depth}`}
 					groupId={this.props.message_id}
@@ -122,71 +141,42 @@ class BetterRepliedMessage extends React.PureComponent {
 					message={this.state.message}
 				/>
 			);
-			let jumpElement = "";
+		}
 
-			switch (this.state.style) {
-				case "blockquote":
-					jumpElement = (
-						<div
-							className={"better-reply-jump"}
-							onClick={() => {
-								if (this.state.channel) {
-									transitionTo(
-										`/channels/${this.state.channel.guild_id}/${this.props.channel_id}/${this.props.message_id}`
-									);
-								}
-							}}
-						>
-							<FontAwesome
-								className={"better-reply-icon"}
-								icon={"eye"}
-							/>{" "}
-							Jump to Message
-						</div>
-					);
+		let jumpElement = (
+			<JumpButton
+				message={this.state.message}
+				channel={this.state.channel}
+				messageDeleted={this.state.messageDeleted}
+				style={this.state.style}
+			/>
+		);
 
-					replyElement = parser.defaultRules.blockQuote.react(
-						{
-							content: (
-								<>
-									{jumpElement}
-									{messageElement}
-								</>
-							),
-						},
-						(content) => {
-							return content;
-						},
-						{}
-					);
-					break;
-				default:
-					jumpElement = (
-						<div
-							className={"better-reply-jump"}
-							onClick={() => {
-								if (this.state.channel) {
-									transitionTo(
-										`/channels/${this.state.channel.guild_id}/${this.props.channel_id}/${this.props.message_id}`
-									);
-								}
-							}}
-						>
-							<FontAwesome
-								className={"better-reply-icon"}
-								icon={"eye"}
-							/>
-						</div>
-					);
-
-					replyElement = (
-						<>
-							{jumpElement}
-							{messageElement}
-						</>
-					);
-					break;
-			}
+		switch (this.state.style) {
+			case "blockquote":
+				replyElement = parser.defaultRules.blockQuote.react(
+					{
+						content: (
+							<>
+								{jumpElement}
+								{messageElement}
+							</>
+						),
+					},
+					(content) => {
+						return content;
+					},
+					{}
+				);
+				break;
+			default:
+				replyElement = (
+					<>
+						{jumpElement}
+						{messageElement}
+					</>
+				);
+				break;
 		}
 
 		return (
