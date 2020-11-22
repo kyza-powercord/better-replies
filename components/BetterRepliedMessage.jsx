@@ -4,12 +4,16 @@ const {
 	util: { getOwnerInstance, getReactInstance, findInReactTree },
 	injector: { inject, uninject },
 	http: { get },
+	components: {
+		Icons: { FontAwesome },
+	},
 } = require("powercord");
 
 // const MessageCache = require("../MessageCache");
 
 const classes = {
 	...getModule(["repliedMessage"], false),
+	...getModule(["blockquoteDivider"], false),
 };
 
 const ChannelMessage = getModule(
@@ -26,6 +30,7 @@ const Message = getModule(
 const { getMessageByReference } = getModule(["getMessageByReference"], false);
 const { getMessage } = getModule(["getMessages"], false);
 const { getChannel } = getModule(["getChannel"], false);
+const { transitionTo } = getModule(["transitionTo"], false);
 
 let messageUpdateInterval;
 
@@ -38,6 +43,7 @@ class BetterRepliedMessage extends React.PureComponent {
 			message: this.getMessage(),
 			channel: getChannel(this.props.channel_id),
 			error: null,
+			style: "default" ?? "default",
 		};
 
 		this.init();
@@ -84,7 +90,7 @@ class BetterRepliedMessage extends React.PureComponent {
 			getMessageByReference({
 				message_id: this.props.message_id,
 			}).message ??
-			this.state.message
+			this?.state?.message
 		);
 	};
 
@@ -108,30 +114,84 @@ class BetterRepliedMessage extends React.PureComponent {
 			console.error(this.state.error);
 			replyElement = this.state.error.toString();
 		} else if (this.state.message && this.state.channel) {
-			replyElement = parser.defaultRules.blockQuote.react(
-				{
-					content: (
-						<ChannelMessage
-							id={`better-reply-${this.props.message_id}-depth-${this.state.depth}`}
-							groupId={this.props.message_id}
-							channel={this.state.channel}
-							message={this.state.message}
-						/>
-					),
-				},
-				(content) => {
-					return content;
-				},
-				{}
+			const messageElement = (
+				<ChannelMessage
+					id={`better-reply-${this.props.message_id}-depth-${this.state.depth}`}
+					groupId={this.props.message_id}
+					channel={this.state.channel}
+					message={this.state.message}
+				/>
 			);
+			let jumpElement = "";
+
+			switch (this.state.style) {
+				case "blockquote":
+					jumpElement = (
+						<div
+							className={"better-reply-jump"}
+							onClick={() => {
+								if (this.state.channel) {
+									transitionTo(
+										`/channels/${this.state.channel.guild_id}/${this.props.channel_id}/${this.props.message_id}`
+									);
+								}
+							}}
+						>
+							<FontAwesome
+								className={"better-reply-icon"}
+								icon={"eye"}
+							/>{" "}
+							Jump to Message
+						</div>
+					);
+
+					replyElement = parser.defaultRules.blockQuote.react(
+						{
+							content: (
+								<>
+									{jumpElement}
+									{messageElement}
+								</>
+							),
+						},
+						(content) => {
+							return content;
+						},
+						{}
+					);
+					break;
+				default:
+					jumpElement = (
+						<div
+							className={"better-reply-jump"}
+							onClick={() => {
+								if (this.state.channel) {
+									transitionTo(
+										`/channels/${this.state.channel.guild_id}/${this.props.channel_id}/${this.props.message_id}`
+									);
+								}
+							}}
+						>
+							<FontAwesome
+								className={"better-reply-icon"}
+								icon={"eye"}
+							/>
+						</div>
+					);
+
+					replyElement = (
+						<>
+							{jumpElement}
+							{messageElement}
+						</>
+					);
+					break;
+			}
 		}
 
 		return (
 			<div
-				className={`better-reply ${classes.repliedMessage}`}
-				// onClick={() => {
-				// 	this.loadReference();
-				// }}
+				className={`better-reply better-reply-style-${this.state.style} ${classes.repliedMessage}`}
 			>
 				{replyElement}
 			</div>

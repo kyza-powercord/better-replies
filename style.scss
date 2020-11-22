@@ -1,7 +1,64 @@
+:root {
+	--better-reply-default-background: rgba(0, 0, 0, 0.1);
+	--better-reply-default-button-background: rgba(0, 0, 0, 0.2);
+}
+
+[class*="replyLink-"],
+[class*="replyLink-"] + [class*="username-"] {
+	display: none;
+	margin: 0;
+}
+.better-reply + [class*="contents-"] [class*="timestamp-"],
+.better-reply + [class*="contents-"] [class*="username-"],
+.better-reply [class*="username-"] {
+	margin: 0;
+}
+
 .better-reply [class*="header-"] {
 	font-size: 16px;
 }
 
-.better-reply blockquote {
+[id*="better-reply-"] {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	padding-right: 8px;
+}
+
+.better-reply.better-reply-style-default {
+	margin: 0 !important;
+	padding: 8px;
+	border-radius: 8px;
+	background-color: var(--better-reply-default-background);
+}
+
+.better-reply.better-reply-style-blockquote blockquote,
+.better-reply.better-reply-style-default {
+	display: inline-block;
 	padding-left: 0;
+	padding-right: 0;
+}
+
+.better-reply.better-reply-style-blockquote blockquote {
+	display: inline-grid;
+	grid-template-rows: auto auto;
+}
+
+.better-reply .better-reply-jump {
+	display: inline;
+	cursor: pointer;
+	user-select: none;
+}
+
+.better-reply.better-reply.better-reply-style-default .better-reply-jump {
+	position: absolute;
+	top: calc(50% - 12px);
+	left: -12px;
+	border-radius: 100%;
+	width: auto;
+	background-color: var(--better-reply-default-button-background);
+	padding: 4px;
+}
+.better-reply.better-reply.better-reply-style-blockquote .better-reply-jump {
+	padding-left: 16px;
+	width: auto;
 }

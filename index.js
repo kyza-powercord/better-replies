@@ -51,7 +51,7 @@ module.exports = class BetterReplies extends (
 
 	channelMessage(args, res) {
 		const repliedMessage = args?.[0]?.message?.messageReference;
-		const depth = res.props?.id.split("depth-")?.[1] ?? 0;
+		const depth = res.props?.id?.split("depth-")?.[1] ?? 0;
 
 		if (args?.[0]?.message?.messageReference && depth < 2) {
 			res.props.childrenRepliedMessage = React.createElement(
