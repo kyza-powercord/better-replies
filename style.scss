@@ -15,14 +15,18 @@
 	background-color: var(--better-reply-default-background);
 }
 
-.better-reply.better-reply-style-blockquote blockquote,
+.better-reply.better-reply-style-blockquote
+	> [class*="blockquoteContainer-"]
+	> blockquote,
 .better-reply.better-reply-style-default {
 	display: inline-block;
 	padding-left: 0;
 	padding-right: 0;
 }
 
-.better-reply.better-reply-style-blockquote blockquote {
+.better-reply.better-reply-style-blockquote
+	> [class*="blockquoteContainer-"]
+	> blockquote {
 	display: inline-grid;
 	grid-template-rows: auto auto;
 }

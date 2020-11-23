@@ -36,169 +36,145 @@ const { transitionTo } = getModule(["transitionTo"], false);
 
 let messageUpdateInterval;
 
-class BetterRepliedMessage extends React.PureComponent {
-	constructor(props) {
-		super(props);
+function BetterRepliedMessage(props) {
+	const [depth] = React.useState(props.depth ?? 0);
+	const [messageDeleted, setMessageDeleted] = React.useState(false);
+	const [message, setMessage] = React.useState(getMessageBetter());
+	const [channel, setChannel] = React.useState(getChannel(props.channel_id));
+	const [error, setError] = React.useState(null);
+	const [style, setStyle] = React.useState(
+		props.referenceStyle ?? props.settings.get("reference-style", "default")
+	);
 
-		this.state = {
-			depth: this.props.depth ?? 0,
-			message: this.getMessage(),
-			channel: getChannel(this.props.channel_id),
-			error: null,
-			messageDeleted: false,
-			style: this.props.style ?? "default", // "default" or "blockquote"
-		};
+	// At least I got this right. Probably.
+	React.useEffect(() => {
+		setStyle(props.referenceStyle);
+	}, [props.referenceStyle]);
 
-		this.init();
-	}
+	// New to hooks. This can probably be much better.
+	React.useEffect(() => {
+		FluxDispatcher.subscribe("MESSAGE_UPDATE", checkUpdateMessage);
+		FluxDispatcher.subscribe("MESSAGE_REACTION_ADD", checkUpdateMessage);
+		FluxDispatcher.subscribe("MESSAGE_REACTION_REMOVE", checkUpdateMessage);
 
-	init = () => {
-		try {
-			this.uninit();
-		} catch {}
-		FluxDispatcher.subscribe("MESSAGE_UPDATE", this.checkUpdateMessage);
-		FluxDispatcher.subscribe(
-			"MESSAGE_REACTION_ADD",
-			this.checkUpdateMessage
-		);
-		FluxDispatcher.subscribe(
-			"MESSAGE_REACTION_REMOVE",
-			this.checkUpdateMessage
-		);
-
-		FluxDispatcher.subscribe("MESSAGE_DELETE", this.onMessageDeleted);
+		FluxDispatcher.subscribe("MESSAGE_DELETE", onMessageDeleted);
 
 		messageUpdateInterval = setInterval(() => {
-			this.forceUpdateMessage();
+			forceUpdateMessage();
 		}, 1e3);
-	};
+		return () => {
+			FluxDispatcher.unsubscribe("MESSAGE_UPDATE", checkUpdateMessage);
+			FluxDispatcher.unsubscribe(
+				"MESSAGE_REACTION_ADD",
+				checkUpdateMessage
+			);
+			FluxDispatcher.unsubscribe(
+				"MESSAGE_REACTION_REMOVE",
+				checkUpdateMessage
+			);
 
-	uninit = () => {
-		FluxDispatcher.unsubscribe("MESSAGE_UPDATE", this.checkUpdateMessage);
-		FluxDispatcher.unsubscribe(
-			"MESSAGE_REACTION_ADD",
-			this.checkUpdateMessage
-		);
-		FluxDispatcher.unsubscribe(
-			"MESSAGE_REACTION_REMOVE",
-			this.checkUpdateMessage
-		);
+			FluxDispatcher.unsubscribe("MESSAGE_DELETE", onMessageDeleted);
 
-		FluxDispatcher.unsubscribe("MESSAGE_DELETE", this.onMessageDeleted);
+			clearInterval(messageUpdateInterval);
+		};
+	});
 
-		clearInterval(messageUpdateInterval);
-	};
-
-	componentWillUnmount = () => {
-		this.uninit();
-	};
-
-	onMessageDeleted = (args) => {
-		if (args?.id === this.props.message_id) {
-			this.messageDeleted();
+	function onMessageDeleted(args) {
+		if (args?.id === props.message_id) {
+			setMessageDeleted(true);
 		}
-	};
+	}
 
-	messageDeleted = () => {
-		console.log("Set deleted:", this.props.message_id);
-		this.setState({ messageDeleted: true });
-	};
-
-	getMessage = () => {
-		if (this?.state?.messageDeleted) return null;
+	function getMessageBetter() {
+		if (messageDeleted) return null;
 
 		const message =
-			getMessage(this.props.channel_id, this.props.message_id) ??
+			getMessage(props.channel_id, props.message_id) ??
 			getMessageByReference({
-				message_id: this.props.message_id,
+				message_id: props.message_id,
 			}).message;
 
 		// Assume the message is deleted for now.
-		if (!message) this.messageDeleted();
+		if (!message) setMessageDeleted(true);
 
 		return message;
-	};
+	}
 
-	checkUpdateMessage = (args) => {
-		if (args?.message?.id === this.props.message_id) {
-			this.forceUpdateMessage();
+	function checkUpdateMessage(args) {
+		if (args?.message?.id === props.message_id) {
+			forceUpdateMessage();
 		}
-	};
+	}
 
-	forceUpdateMessage = () => {
-		this.setState({
-			message: this.getMessage(),
-		});
-	};
+	function forceUpdateMessage() {
+		setMessage(getMessageBetter());
+	}
 
-	render() {
-		this.init();
+	let replyElement = "";
 
-		let replyElement = "";
-
-		// TODO: Less pain.
-		let messageElement = "      Loading...   ";
-		if (this.state.messageDeleted) {
-			messageElement = "   Message deleted.   ";
-		} else if (this.state.error) {
-			messageElement = this.state.error.toString();
-		} else if (this.state.message && this.state.channel) {
-			messageElement = (
-				<ChannelMessage
-					id={`better-reply-${this.props.message_id}-depth-${this.state.depth}`}
-					groupId={this.props.message_id}
-					channel={this.state.channel}
-					message={this.state.message}
-				/>
-			);
-		}
-
-		let jumpElement = (
-			<JumpButton
-				message={this.state.message}
-				channel={this.state.channel}
-				messageDeleted={this.state.messageDeleted}
-				style={this.state.style}
+	// TODO: Less pain.
+	let messageElement = "      Loading...   ";
+	if (messageDeleted) {
+		messageElement = "   Message deleted.   ";
+	} else if (error) {
+		messageElement = error.toString();
+	} else if (message && channel) {
+		messageElement = (
+			<ChannelMessage
+				id={`better-reply-${props.message_id}-depth-${depth}`}
+				groupId={props.message_id}
+				channel={channel}
+				message={message}
 			/>
 		);
-
-		switch (this.state.style) {
-			case "blockquote":
-				replyElement = parser.defaultRules.blockQuote.react(
-					{
-						content: (
-							<>
-								{messageElement}
-								{jumpElement}
-							</>
-						),
-					},
-					(content) => {
-						return content;
-					},
-					{}
-				);
-				break;
-			default:
-				replyElement = (
-					<>
-						{messageElement}
-						{jumpElement}
-					</>
-				);
-				break;
-		}
-
-		return (
-			<div
-				className={`better-reply better-reply-style-${this.state.style} ${classes.repliedMessage}`}
-			>
-				{replyElement}
-			</div>
-		);
 	}
+
+	let jumpElement = (
+		<JumpButton
+			message={message}
+			channel={channel}
+			messageDeleted={messageDeleted}
+			style={style}
+		/>
+	);
+
+	switch (style) {
+		case "blockquote":
+			replyElement = parser.defaultRules.blockQuote.react(
+				{
+					content: (
+						<>
+							{jumpElement}
+							{messageElement}
+						</>
+					),
+				},
+				(content) => {
+					return content;
+				},
+				{}
+			);
+			break;
+		default:
+			replyElement = (
+				<>
+					{messageElement}
+					{jumpElement}
+				</>
+			);
+			break;
+	}
+
+	return (
+		<div
+			className={`better-reply better-reply-style-${style} ${classes.repliedMessage}`}
+		>
+			{replyElement}
+		</div>
+	);
 }
 
-module.exports =
+module.exports = React.memo(
 	window.KLibrary?.Tools?.ReactTools?.WrapBoundary?.(BetterRepliedMessage) ??
-	BetterRepliedMessage;
+		BetterRepliedMessage
+);

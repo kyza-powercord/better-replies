@@ -25,9 +25,9 @@ const styleOptions = [
 		value: "default",
 	},
 	{
-		name: "Quoteblock",
-		desc: "Displays the codeblock reply style.",
-		value: "quoteblock",
+		name: "Blockquote",
+		desc: "Displays the blockquote reply style.",
+		value: "blockquote",
 	},
 	{
 		name: "None",
@@ -36,49 +36,35 @@ const styleOptions = [
 	},
 ];
 
-class StyleSettings extends React.PureComponent {
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-		return (
-			<>
-				<RadioGroup
-					onChange={(e) =>
-						this.props.settings.updateSetting(
-							"reference-style",
-							e.value
-						)
-					}
-					value={this.props.settings.getSetting(
-						"reference-style",
-						"default"
-					)}
-					options={styleOptions}
-				>
-					<Text size={Text.Sizes.SIZE_16}>Reference Style</Text>
-				</RadioGroup>
-				<RadioGroup
-					onChange={(e) =>
-						this.props.settings.updateSetting(
-							"message-link-style",
-							e.value
-						)
-					}
-					value={this.props.settings.getSetting(
-						"message-link-style",
-						"default"
-					)}
-					options={styleOptions}
-				>
-					<Text size={Text.Sizes.SIZE_16}>Message Link Style</Text>
-				</RadioGroup>
-			</>
-		);
-	}
+function StyleSettings(props) {
+	return (
+		<>
+			<RadioGroup
+				onChange={(e) => {
+					props.settings.updateSetting("reference-style", e.value);
+				}}
+				value={props.settings.getSetting("reference-style", "default")}
+				options={styleOptions}
+			>
+				<Text size={Text.Sizes.SIZE_16}>Reference Style</Text>
+			</RadioGroup>
+			<RadioGroup
+				onChange={(e) => {
+					props.settings.updateSetting("message-link-style", e.value);
+				}}
+				value={props.settings.getSetting(
+					"message-link-style",
+					"default"
+				)}
+				options={styleOptions}
+			>
+				<Text size={Text.Sizes.SIZE_16}>Message Link Style</Text>
+			</RadioGroup>
+		</>
+	);
 }
 
-module.exports =
+module.exports = React.memo(
 	window.KLibrary?.Tools?.ReactTools?.WrapBoundary?.(StyleSettings) ??
-	StyleSettings;
+		StyleSettings
+);

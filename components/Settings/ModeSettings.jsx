@@ -36,49 +36,35 @@ const modeOptions = [
 	},
 ];
 
-class ModeSettings extends React.PureComponent {
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-		return (
-			<>
-				<RadioGroup
-					onChange={(e) =>
-						this.props.settings.updateSetting(
-							"reference-mode",
-							e.value
-						)
-					}
-					value={this.props.settings.getSetting(
-						"reference-mode",
-						"default"
-					)}
-					options={modeOptions}
-				>
-					<Text size={Text.Sizes.SIZE_16}>Reference Mode</Text>
-				</RadioGroup>
-				<RadioGroup
-					onChange={(e) =>
-						this.props.settings.updateSetting(
-							"message-link-mode",
-							e.value
-						)
-					}
-					value={this.props.settings.getSetting(
-						"message-link-mode",
-						"default"
-					)}
-					options={modeOptions}
-				>
-					<Text size={Text.Sizes.SIZE_16}>Message Link Mode</Text>
-				</RadioGroup>
-			</>
-		);
-	}
+function ModeSettings(props) {
+	return (
+		<>
+			<RadioGroup
+				onChange={(e) => {
+					props.settings.updateSetting("reference-mode", e.value);
+				}}
+				value={props.settings.getSetting("reference-mode", "default")}
+				options={modeOptions}
+			>
+				<Text size={Text.Sizes.SIZE_16}>Reference Mode</Text>
+			</RadioGroup>
+			<RadioGroup
+				onChange={(e) => {
+					props.settings.updateSetting("message-link-mode", e.value);
+				}}
+				value={props.settings.getSetting(
+					"message-link-mode",
+					"default"
+				)}
+				options={modeOptions}
+			>
+				<Text size={Text.Sizes.SIZE_16}>Message Link Mode</Text>
+			</RadioGroup>
+		</>
+	);
 }
 
-module.exports =
+module.exports = React.memo(
 	window.KLibrary?.Tools?.ReactTools?.WrapBoundary?.(ModeSettings) ??
-	ModeSettings;
+		ModeSettings
+);

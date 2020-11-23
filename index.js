@@ -62,14 +62,20 @@ module.exports = class BetterReplies extends (
 		window.KLibrary?.Tools?.ReactTools?.rerenderAllMessages();
 	}
 
-	channelMessage(args, res) {
+	channelMessage = (args, res) => {
 		const repliedMessage = args?.[0]?.message?.messageReference;
 		const depth = res.props?.id?.split("depth-")?.[1] ?? 0;
 
-		if (args?.[0]?.message?.messageReference && depth < 2) {
+		if (
+			args?.[0]?.message?.messageReference &&
+			depth < this.settings.get("max-depth", 2)
+		) {
+			console.log("bruh", res.props.referenceStyle);
 			res.props.childrenRepliedMessage = React.createElement(
 				BetterRepliedMessage,
 				{
+					referenceStyle: res.props.referenceStyle,
+					settings: this.settings,
 					depth: depth + 1,
 					message_id: repliedMessage?.message_id,
 					channel_id: repliedMessage?.channel_id,
@@ -77,5 +83,5 @@ module.exports = class BetterReplies extends (
 			);
 		}
 		return res;
-	}
+	};
 };

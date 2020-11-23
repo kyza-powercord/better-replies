@@ -9,77 +9,45 @@ const {
 	},
 } = require("powercord");
 
-// const MessageCache = require("../MessageCache");
-
-const classes = {
-	...getModule(["repliedMessage"], false),
-	...getModule(["blockquoteDivider"], false),
-};
-
-const ChannelMessage = getModule(
-	(m) => m?.type?.displayName === "ChannelMessage",
-	false
-);
-const parser = getModule(["parse", "parseTopic"], false);
-
-const Message = getModule(
-	(m) => m?.prototype?.getReaction && m?.prototype?.isSystemDM,
-	false
-);
-
-const { getMessageByReference } = getModule(["getMessageByReference"], false);
-const { getMessage } = getModule(["getMessages"], false);
-const { getChannel } = getModule(["getChannel"], false);
 const { transitionTo } = getModule(["transitionTo"], false);
 
-let messageUpdateInterval;
+function JumpButton(props) {
+	let jumpElement = "";
 
-class JumpButton extends React.PureComponent {
-	constructor(props) {
-		super(props);
+	switch (props.style) {
+		case "blockquote":
+			jumpElement = (
+				<>
+					<FontAwesome className={"better-reply-icon"} icon={"eye"} />{" "}
+					Jump to Message
+				</>
+			);
+			break;
+		default:
+			jumpElement = (
+				<FontAwesome className={"better-reply-icon"} icon={"eye"} />
+			);
+			break;
 	}
 
-	render() {
-		let jumpElement = "";
-
-		switch (this.props.style) {
-			case "blockquote":
-				jumpElement = (
-					<>
-						<FontAwesome
-							className={"better-reply-icon"}
-							icon={"eye"}
-						/>{" "}
-						Jump to Message
-					</>
-				);
-				break;
-			default:
-				jumpElement = (
-					<FontAwesome className={"better-reply-icon"} icon={"eye"} />
-				);
-				break;
-		}
-
-		return !this.props.messageDeleted ? (
-			<div
-				className={"better-reply-jump"}
-				onClick={() => {
-					if (this.props.channel) {
-						transitionTo(
-							`/channels/${this.props.channel.guild_id}/${this.props.channel.id}/${this.props.message.id}`
-						);
-					}
-				}}
-			>
-				{jumpElement}
-			</div>
-		) : (
-			""
-		);
-	}
+	return !props.messageDeleted ? (
+		<div
+			className={"better-reply-jump"}
+			onClick={() => {
+				if (props.channel) {
+					transitionTo(
+						`/channels/${props.channel.guild_id}/${props.channel.id}/${props.message.id}`
+					);
+				}
+			}}
+		>
+			{jumpElement}
+		</div>
+	) : (
+		""
+	);
 }
 
-module.exports =
-	window.KLibrary?.Tools?.ReactTools?.WrapBoundary?.(JumpButton) ??
-	JumpButton;
+module.exports = React.memo(
+	window.KLibrary?.Tools?.ReactTools?.WrapBoundary?.(JumpButton) ?? JumpButton
+);
