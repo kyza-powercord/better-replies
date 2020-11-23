@@ -34,9 +34,13 @@ function JumpButton(props) {
 		<div
 			className={"better-reply-jump"}
 			onClick={() => {
-				if (props.channel) {
+				if (props.message?.id && props.channel?.id) {
 					transitionTo(
-						`/channels/${props.channel.guild_id}/${props.channel.id}/${props.message.id}`
+						`/channels/${
+							props.channel.guild_id
+								? props.channel.guild_id
+								: "@me"
+						}/${props.channel.id}/${props.message.id}`
 					);
 				}
 			}}

@@ -64,13 +64,17 @@ module.exports = class BetterReplies extends (
 
 	channelMessage = (args, res) => {
 		const repliedMessage = args?.[0]?.message?.messageReference;
-		const depth = res.props?.id?.split("depth-")?.[1] ?? 0;
+		const depth = parseInt(res.props?.id?.split("depth-")?.[1] ?? 0);
+		const messageElement = findInReactTree(
+			res,
+			(r) => r?.childrenRepliedMessage
+		);
 
 		if (
 			args?.[0]?.message?.messageReference &&
 			depth < this.settings.get("max-depth", 2)
 		) {
-			res.props.childrenRepliedMessage = React.createElement(
+			messageElement.childrenRepliedMessage = React.createElement(
 				BetterRepliedMessage,
 				{
 					referenceMode:
@@ -85,6 +89,7 @@ module.exports = class BetterReplies extends (
 					channel_id: repliedMessage?.channel_id,
 				}
 			);
+			console.log(res);
 		}
 		return res;
 	};
