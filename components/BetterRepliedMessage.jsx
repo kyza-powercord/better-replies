@@ -46,7 +46,7 @@ class BetterRepliedMessage extends React.PureComponent {
 			channel: getChannel(this.props.channel_id),
 			error: null,
 			messageDeleted: false,
-			style: this.props.style ?? "default",
+			style: this.props.style ?? "default", // "default" or "blockquote"
 		};
 
 		this.init();
@@ -66,7 +66,7 @@ class BetterRepliedMessage extends React.PureComponent {
 			this.checkUpdateMessage
 		);
 
-		FluxDispatcher.subscribe("MESSAGE_DELETE", this.checkMessageDeleted);
+		FluxDispatcher.subscribe("MESSAGE_DELETE", this.onMessageDeleted);
 
 		messageUpdateInterval = setInterval(() => {
 			this.forceUpdateMessage();
@@ -84,7 +84,7 @@ class BetterRepliedMessage extends React.PureComponent {
 			this.checkUpdateMessage
 		);
 
-		FluxDispatcher.unsubscribe("MESSAGE_DELETE", this.checkMessageDeleted);
+		FluxDispatcher.unsubscribe("MESSAGE_DELETE", this.onMessageDeleted);
 
 		clearInterval(messageUpdateInterval);
 	};
@@ -93,13 +93,14 @@ class BetterRepliedMessage extends React.PureComponent {
 		this.uninit();
 	};
 
-	checkMessageDeleted = (args) => {
+	onMessageDeleted = (args) => {
 		if (args?.id === this.props.message_id) {
 			this.messageDeleted();
 		}
 	};
 
 	messageDeleted = () => {
+		console.log("Set deleted:", this.props.message_id);
 		this.setState({ messageDeleted: true });
 	};
 
@@ -111,8 +112,6 @@ class BetterRepliedMessage extends React.PureComponent {
 			getMessageByReference({
 				message_id: this.props.message_id,
 			}).message;
-
-		console.log(message);
 
 		// Assume the message is deleted for now.
 		if (!message) this.messageDeleted();
@@ -137,6 +136,7 @@ class BetterRepliedMessage extends React.PureComponent {
 
 		let replyElement = "";
 
+		// TODO: Less pain.
 		let messageElement = "      Loading...   ";
 		if (this.state.messageDeleted) {
 			messageElement = "   Message deleted.   ";
@@ -168,8 +168,8 @@ class BetterRepliedMessage extends React.PureComponent {
 					{
 						content: (
 							<>
-								{jumpElement}
 								{messageElement}
+								{jumpElement}
 							</>
 						),
 					},
@@ -182,8 +182,8 @@ class BetterRepliedMessage extends React.PureComponent {
 			default:
 				replyElement = (
 					<>
-						{jumpElement}
 						{messageElement}
+						{jumpElement}
 					</>
 				);
 				break;

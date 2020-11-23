@@ -65,7 +65,7 @@ class JumpButton extends React.PureComponent {
 			<div
 				className={"better-reply-jump"}
 				onClick={() => {
-					if (this.state.channel) {
+					if (this.props.channel) {
 						transitionTo(
 							`/channels/${this.props.channel.guild_id}/${this.props.channel.id}/${this.props.message.id}`
 						);
