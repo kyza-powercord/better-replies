@@ -36,7 +36,7 @@ const modeOptions = [
 	},
 ];
 
-class StyleSettings extends React.PureComponent {
+class ModeSettings extends React.PureComponent {
 	constructor(props) {
 		super(props);
 	}
@@ -80,5 +80,5 @@ class StyleSettings extends React.PureComponent {
 }
 
 module.exports =
-	window.KLibrary?.Tools?.ReactTools?.WrapBoundary?.(StyleSettings) ??
-	StyleSettings;
+	window.KLibrary?.Tools?.ReactTools?.WrapBoundary?.(ModeSettings) ??
+	ModeSettings;
