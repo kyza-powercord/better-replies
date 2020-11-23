@@ -65,10 +65,11 @@ module.exports = class BetterReplies extends (
 	channelMessage = (args, res) => {
 		const repliedMessage = args?.[0]?.message?.messageReference;
 		const depth = parseInt(res.props?.id?.split("depth-")?.[1] ?? 0);
-		const messageElement = findInReactTree(
-			res,
-			(r) => r?.childrenRepliedMessage
-		);
+		const messageElement =
+			findInReactTree(res, (r) => r.childrenRepliedMessage) ??
+			res.props.childrenRepliedMessage
+				? res.props
+				: null;
 
 		if (
 			args?.[0]?.message?.messageReference &&
