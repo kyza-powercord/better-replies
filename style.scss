@@ -1,17 +1,7 @@
 :root {
 	--better-reply-default-background: rgba(0, 0, 0, 0.1);
 	--better-reply-default-button-background: rgba(0, 0, 0, 0.2);
-}
-
-[class*="replyLink-"],
-[class*="replyLink-"] + [class*="username-"] {
-	display: none;
-	margin: 0;
-}
-.better-reply + [class*="contents-"] [class*="timestamp-"],
-.better-reply + [class*="contents-"] [class*="username-"],
-.better-reply [class*="username-"] {
-	margin: 0;
+	--settings-gap: 16px;
 }
 
 .better-reply [class*="header-"] {
@@ -56,3 +46,19 @@
 	padding-left: 16px;
 	width: auto;
 }
+
+/* Settings */
+.better-replies-settings-tabs {
+	display: grid;
+	grid-template-columns: auto auto auto auto;
+
+	text-align: center;
+}
+// .better-replies-settings {
+// 	display: grid;
+
+// 	grid-template-columns: calc(50% - (var(--settings-gap) / 2)) calc(
+// 			50% - (var(--settings-gap) / 2)
+// 		);
+// 	column-gap: var(--settings-gap);
+// }

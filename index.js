@@ -5,6 +5,7 @@ const {
 	injector: { inject, uninject },
 } = require("powercord");
 
+const Settings = require("./components/Settings");
 const BetterRepliedMessage = require("./components/BetterRepliedMessage");
 
 const RepliedMessage = getModule(
@@ -22,6 +23,17 @@ module.exports = class BetterReplies extends (
 ) {
 	async startPlugin() {
 		this.loadStylesheet("style.scss");
+
+		powercord.api.settings.registerSettings(this.entityID, {
+			category: this.entityID,
+			label: "Better Replies",
+			render: (settings) =>
+				React.createElement(Settings, {
+					settings,
+					plugin: this,
+					settingsID: this.entityID,
+				}),
+		});
 
 		inject(
 			"better-replies-chat-channel-message",
@@ -43,9 +55,10 @@ module.exports = class BetterReplies extends (
 	}
 
 	pluginWillUnload() {
-		// uninject("better-replies-replied-message");
 		uninject("better-replies-chat-channel-message");
 		uninject("better-replies-search-channel-message");
+		powercord.api.settings.unregisterSettings(this.entityID);
+
 		window.KLibrary?.Tools?.ReactTools?.rerenderAllMessages();
 	}
 
