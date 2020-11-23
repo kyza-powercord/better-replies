@@ -89,7 +89,6 @@ module.exports = class BetterReplies extends (
 					channel_id: repliedMessage?.channel_id,
 				}
 			);
-			console.log(res);
 		}
 		return res;
 	};
