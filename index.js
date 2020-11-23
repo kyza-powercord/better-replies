@@ -74,7 +74,12 @@ module.exports = class BetterReplies extends (
 			res.props.childrenRepliedMessage = React.createElement(
 				BetterRepliedMessage,
 				{
-					referenceStyle: res.props.referenceStyle,
+					referenceStyle:
+						res.props.referenceStyle ??
+						this.settings.get(
+							"reference-style",
+							"better-reference"
+						),
 					settings: this.settings,
 					depth: depth + 1,
 					message_id: repliedMessage?.message_id,
