@@ -20,9 +20,9 @@ const margins = getModule(["marginTop20"], false);
 
 const modeOptions = [
 	{
-		name: "Default",
+		name: "Auto",
 		desc: "Matches the current cozy/compact appearance setting.",
-		value: "default",
+		value: "auto",
 	},
 	{
 		name: "Cozy",
@@ -43,7 +43,7 @@ function ModeSettings(props) {
 				onChange={(e) => {
 					props.settings.updateSetting("reference-mode", e.value);
 				}}
-				value={props.settings.getSetting("reference-mode", "default")}
+				value={props.settings.getSetting("reference-mode", "auto")}
 				options={modeOptions}
 			>
 				<Text size={Text.Sizes.SIZE_16}>Reference Mode</Text>
@@ -52,10 +52,7 @@ function ModeSettings(props) {
 				onChange={(e) => {
 					props.settings.updateSetting("message-link-mode", e.value);
 				}}
-				value={props.settings.getSetting(
-					"message-link-mode",
-					"default"
-				)}
+				value={props.settings.getSetting("message-link-mode", "auto")}
 				options={modeOptions}
 			>
 				<Text size={Text.Sizes.SIZE_16}>Message Link Mode</Text>

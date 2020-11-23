@@ -4,31 +4,9 @@
 	--settings-gap: 16px;
 }
 
+/* Default Reply Styles */
 .better-reply [class*="header-"] {
 	font-size: 16px;
-}
-
-.better-reply.better-reply-style-default {
-	margin: 0 !important;
-	padding: 8px;
-	border-radius: 8px;
-	background-color: var(--better-reply-default-background);
-}
-
-.better-reply.better-reply-style-blockquote
-	> [class*="blockquoteContainer-"]
-	> blockquote,
-.better-reply.better-reply-style-default {
-	display: inline-block;
-	padding-left: 0;
-	padding-right: 0;
-}
-
-.better-reply.better-reply-style-blockquote
-	> [class*="blockquoteContainer-"]
-	> blockquote {
-	display: inline-grid;
-	grid-template-rows: auto auto;
 }
 
 .better-reply .better-reply-jump {
@@ -36,8 +14,24 @@
 	cursor: pointer;
 	user-select: none;
 }
+.better-reply [class*="compact-"] {
+	padding-left: 16px;
+}
 
-.better-reply.better-reply.better-reply-style-default .better-reply-jump {
+/* Better Reply Style */
+.better-reply.better-reply-style-better {
+	margin: 0 !important;
+	padding: 8px;
+	border-radius: 8px;
+	background-color: var(--better-reply-default-background);
+}
+
+.better-reply.better-reply-style-better {
+	display: inline-block;
+	padding-left: 0;
+	padding-right: 0;
+}
+.better-reply.better-reply.better-reply-style-better .better-reply-jump {
 	position: absolute;
 	top: calc(50% - 12px);
 	left: -12px;
@@ -45,6 +39,21 @@
 	width: auto;
 	background-color: var(--better-reply-default-button-background);
 	padding: 4px;
+}
+
+/* Blockquote Reply Style */
+.better-reply.better-reply-style-blockquote
+	> [class*="blockquoteContainer-"]
+	> blockquote {
+	display: inline-block;
+	padding-left: 0;
+	padding-right: 0;
+}
+.better-reply.better-reply-style-blockquote
+	> [class*="blockquoteContainer-"]
+	> blockquote {
+	display: inline-grid;
+	grid-template-rows: auto auto;
 }
 .better-reply.better-reply.better-reply-style-blockquote .better-reply-jump {
 	padding-left: 16px;
@@ -58,11 +67,3 @@
 
 	text-align: center;
 }
-// .better-replies-settings {
-// 	display: grid;
-
-// 	grid-template-columns: calc(50% - (var(--settings-gap) / 2)) calc(
-// 			50% - (var(--settings-gap) / 2)
-// 		);
-// 	column-gap: var(--settings-gap);
-// }

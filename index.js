@@ -70,16 +70,15 @@ module.exports = class BetterReplies extends (
 			args?.[0]?.message?.messageReference &&
 			depth < this.settings.get("max-depth", 2)
 		) {
-			console.log("bruh", res.props.referenceStyle);
 			res.props.childrenRepliedMessage = React.createElement(
 				BetterRepliedMessage,
 				{
+					referenceMode:
+						res.props.referenceMode ??
+						this.settings.get("reference-mode", "auto"),
 					referenceStyle:
 						res.props.referenceStyle ??
-						this.settings.get(
-							"reference-style",
-							"better-reference"
-						),
+						this.settings.get("reference-style", "better"),
 					settings: this.settings,
 					depth: depth + 1,
 					message_id: repliedMessage?.message_id,

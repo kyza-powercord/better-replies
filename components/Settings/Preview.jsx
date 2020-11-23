@@ -14,6 +14,8 @@ const {
 	},
 } = require("powercord");
 
+const DiscordSettings = getModule(["messageDisplayCompact"], false);
+
 const Message = getModule(
 	(m) => m?.prototype?.getReaction && m?.prototype?.isSystemDM,
 	false
@@ -94,8 +96,10 @@ function Preview(props) {
 			message={fakeMessage}
 			referenceStyle={props.settings.getSetting(
 				"reference-style",
-				"default"
+				"better"
 			)}
+			referenceMode={props.settings.getSetting("reference-mode", "auto")}
+			compact={DiscordSettings.messageDisplayCompact}
 		/>
 	);
 }

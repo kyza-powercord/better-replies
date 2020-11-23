@@ -11,7 +11,7 @@ const {
 
 const JumpButton = require("./JumpButton");
 
-// const MessageCache = require("../MessageCache");
+const DiscordSettings = getModule(["messageDisplayCompact"], false);
 
 const classes = {
 	...getModule(["repliedMessage"], false),
@@ -43,13 +43,24 @@ function BetterRepliedMessage(props) {
 	const [channel, setChannel] = React.useState(getChannel(props.channel_id));
 	const [error, setError] = React.useState(null);
 	const [style, setStyle] = React.useState(
-		props.referenceStyle ?? props.settings.get("reference-style", "default")
+		props.referenceStyle ?? props.settings.get("reference-style", "better")
+	);
+	const [mode, setMode] = React.useState(
+		props.referenceMode ?? props.settings.get("reference-mode", "auto")
 	);
 
 	// At least I got this right. Probably.
 	React.useEffect(() => {
-		setStyle(props.referenceStyle);
+		setStyle(
+			props.referenceStyle ??
+				props.settings.get("reference-style", "better")
+		);
 	}, [props.referenceStyle]);
+	React.useEffect(() => {
+		setMode(
+			props.referenceMode ?? props.settings.get("reference-mode", "auto")
+		);
+	}, [props.referenceMode]);
 
 	// New to hooks. This can probably be much better.
 	React.useEffect(() => {
@@ -125,6 +136,11 @@ function BetterRepliedMessage(props) {
 				groupId={props.message_id}
 				channel={channel}
 				message={message}
+				compact={
+					mode === "auto"
+						? DiscordSettings.messageDisplayCompact
+						: !!(mode === "compact")
+				}
 			/>
 		);
 	}
@@ -155,6 +171,13 @@ function BetterRepliedMessage(props) {
 				{}
 			);
 			break;
+		case "better":
+			replyElement = (
+				<>
+					{messageElement}
+					{jumpElement}
+				</>
+			);
 		default:
 			replyElement = (
 				<>

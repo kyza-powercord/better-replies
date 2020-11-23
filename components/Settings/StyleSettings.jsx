@@ -25,6 +25,11 @@ const styleOptions = [
 		value: "default",
 	},
 	{
+		name: "Better",
+		desc: "Displays the better reply style.",
+		value: "better",
+	},
+	{
 		name: "Blockquote",
 		desc: "Displays the blockquote reply style.",
 		value: "blockquote",
@@ -43,7 +48,10 @@ function StyleSettings(props) {
 				onChange={(e) => {
 					props.settings.updateSetting("reference-style", e.value);
 				}}
-				value={props.settings.getSetting("reference-style", "default")}
+				value={props.settings.getSetting(
+					"reference-style",
+					"better"
+				)}
 				options={styleOptions}
 			>
 				<Text size={Text.Sizes.SIZE_16}>Reference Style</Text>
@@ -54,7 +62,7 @@ function StyleSettings(props) {
 				}}
 				value={props.settings.getSetting(
 					"message-link-style",
-					"default"
+					"blockquote"
 				)}
 				options={styleOptions}
 			>
