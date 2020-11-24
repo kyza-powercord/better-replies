@@ -48,10 +48,7 @@ function StyleSettings(props) {
 				onChange={(e) => {
 					props.settings.updateSetting("reference-style", e.value);
 				}}
-				value={props.settings.getSetting(
-					"reference-style",
-					"better"
-				)}
+				value={props.settings.getSetting("reference-style", "better")}
 				options={styleOptions}
 			>
 				<Text size={Text.Sizes.SIZE_16}>Reference Style</Text>

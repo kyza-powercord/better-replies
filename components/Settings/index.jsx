@@ -8,19 +8,19 @@ const {
 		Card,
 		Text,
 		TabBar,
-		Divider,
 		settings: { FormItem, RadioGroup },
 		Icons: { FontAwesome },
 	},
 } = require("powercord");
+
+const Divider = require("./Divider");
 
 const UserSettingsWindow = getModule(["open", "updateAccount"], false);
 
 const Preview = require("./Preview");
 const StyleSettings = require("./StyleSettings");
 const ModeSettings = require("./ModeSettings");
-
-const margins = getModule(["marginTop20"], false);
+const KeybindSettings = require("./KeybindSettings");
 
 const defaultTab = "style";
 
@@ -48,14 +48,14 @@ function Settings(props) {
 
 	let tab;
 	switch (props.settings.getSetting("last-selected-tab", defaultTab)) {
-		case "style":
+		case "styles":
 			tab = <StyleSettings {...props} />;
 			break;
-		case "mode":
+		case "modes":
 			tab = <ModeSettings {...props} />;
 			break;
 		case "keybinds":
-			tab = <Text>Unfinished.</Text>;
+			tab = <KeybindSettings {...props} />;
 			break;
 		case "miscellaneous":
 			tab = <Text>Unfinished.</Text>;
@@ -68,7 +68,6 @@ function Settings(props) {
 	return (
 		<>
 			<Divider />
-			<div className={margins.marginBottom20}></div>
 			<FormItem
 				title={<Text size={Text.Sizes.SIZE_16}>Preview</Text>}
 				className={"better-replies-preview"}
@@ -86,13 +85,12 @@ function Settings(props) {
 						props.settings.updateSetting("last-selected-tab", e)
 					}
 				>
-					<TabBar.Item id="style">Style</TabBar.Item>
-					<TabBar.Item id="mode">Mode</TabBar.Item>
+					<TabBar.Item id="styles">Styles</TabBar.Item>
+					<TabBar.Item id="modes">Modes</TabBar.Item>
 					<TabBar.Item id="keybinds">Keybinds</TabBar.Item>
 					<TabBar.Item id="miscellaneous">Miscellaneous</TabBar.Item>
 				</TabBar>
 				<Divider />
-				<div className={margins.marginBottom20} />
 				<div className={"better-replies-settings-tab"}>{tab}</div>
 			</div>
 		</>
