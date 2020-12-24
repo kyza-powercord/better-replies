@@ -12,7 +12,14 @@ const RepliedMessage = getModule(
 	(m) => m?.default?.displayName === "RepliedMessage",
 	false
 );
-const ChatChannelMessage = getModule(["MESSAGE_ID_PREFIX"], false).default;
+const ChatChannelMessage = getModule(
+	(m) =>
+		m.type &&
+		(m.__powercordOriginal_type || m.type)
+			.toString()
+			.indexOf("useContextMenuMessage") !== -1,
+	false
+);
 const SearchChannelMessage = getModule(
 	(m) => m?.type?.displayName === "ChannelMessage",
 	false
